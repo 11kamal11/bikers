@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="model_bike_rental" model="ir.model">
+        <field name="name">Bike Rental</field>
+        <field name="model">bike.rental</field>
+    </record>
+    <record id="model_bike_rental_request" model="ir.model">
+        <field name="name">Bike Rental Request</field>
+        <field name="model">bike.rental.request</field>
+    </record>
+</odoo>

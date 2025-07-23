@@ -7,12 +7,12 @@
             <field name="model">bike.rental.request</field>
             <field name="arch" type="xml">
                 <list string="Rental Requests">
-                    <field name="name"/>
-                    <field name="bike_id"/>
-                    <field name="start_date"/>
-                    <field name="duration"/>
-                    <field name="state"/>
-                    <field name="request_date"/>
+                    <field name="name" string="Customer Name"/>
+                    <field name="bike_id" string="Bike"/>
+                    <field name="start_date" string="Start Date"/>
+                    <field name="duration" string="Duration (days)"/>
+                    <field name="state" string="Status"/>
+                    <field name="request_date" string="Request Date"/>
                 </list>
             </field>
         </record>
@@ -22,25 +22,25 @@
             <field name="name">bike.rental.request.form</field>
             <field name="model">bike.rental.request</field>
             <field name="arch" type="xml">
-                <form>
+                <form string="Bike Rental Request">
                     <header>
                         <button name="action_approve" string="Approve" type="object" class="btn-primary" 
-                                states="pending"/>
+                                states="pending" groups="base.group_user"/>
                         <button name="action_reject" string="Reject" type="object" class="btn-secondary" 
-                                states="pending"/>
+                                states="pending" groups="base.group_user"/>
                         <field name="state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
-                                <field name="name"/>
-                                <field name="bike_id"/>
-                                <field name="user_id"/>
+                                <field name="name" string="Customer Name"/>
+                                <field name="bike_id" string="Bike"/>
+                                <field name="user_id" string="Requested By"/>
                             </group>
                             <group>
-                                <field name="start_date"/>
-                                <field name="duration"/>
-                                <field name="request_date"/>
+                                <field name="start_date" string="Start Date"/>
+                                <field name="duration" string="Duration (days)"/>
+                                <field name="request_date" string="Request Date"/>
                             </group>
                         </group>
                     </sheet>
@@ -69,6 +69,9 @@
         </record>
 
         <!-- Menu Item -->
-        <menuitem id="menu_bike_rental_request" name="Rental Requests" parent="menu_bike_rental_root" action="action_bike_rental_request" sequence="40"/>
+        <menuitem id="menu_bike_rental_request" name="Rental Requests" 
+                  parent="bike_rental.menu_bike_rental_root" 
+                  action="action_bike_rental_request" 
+                  sequence="40"/>
     </data>
 </odoo>
