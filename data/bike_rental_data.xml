@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sample Bike Data -->
+        <record id="bike_1" model="bike.rental">
+            <field name="name">Mountain Bike</field>
+            <field name="description">Great for trails and off-road</field>
+            <field name="price">25.0</field>
+            <field name="is_available">True</field>
+        </record>
+        
+        <record id="bike_2" model="bike.rental">
+            <field name="name">City Bike</field>
+            <field name="description">Perfect for city commuting</field>
+            <field name="price">15.0</field>
+            <field name="is_available">True</field>
+        </record>
+    </data>
+</odoo>

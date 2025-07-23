@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Website Menu for Bike Rental -->
+        <record id="menu_bikes" model="website.menu">
+            <field name="name">Bikes</field>
+            <field name="url">/bikes</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- Website Menu for My Requests (for authenticated users) -->
+        <record id="menu_my_requests" model="website.menu">
+            <field name="name">My Requests</field>
+            <field name="url">/my/bike-requests</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- Bike List Template -->
+        <template id="bike_list_template" name="Bike List Template">
+            <t t-call="website.layout">
+                <div id="wrap">
+                    <div class="container mt-4">
+                        <h1 class="text-center mb-4">Available Bikes</h1>
+                        
+                        <!-- Success/Error Messages -->
+                        <t t-if="success">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <t t-esc="success"/>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        </t>
+                        
+                        <t t-if="error">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <t t-esc="error"/>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        </t>
+                        
+                        <!-- Bikes Grid -->
+                        <div class="row">
+                            <t t-if="not bikes">
+                                <div class="col-12">
+                                    <div class="alert alert-info text-center">
+                                        <h4>No bikes available at the moment</h4>
+                                        <p>Please check back later.</p>
+                                    </div>
+                                </div>
+                            </t>
+                            
+                            <t t-foreach="bikes" t-as="bike">
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <t t-if="bike.image">
+                                            <img t-attf-src="data:image/png;base64,#{bike.image}" class="card-img-top" style="height: 200px; object-fit: cover;" t-att-alt="bike.name"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                <span class="text-muted">No Image</span>
+                                            </div>
+                                        </t>
+                                        
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title" t-esc="bike.name"/>
+                                            <p class="card-text flex-grow-1" t-esc="bike.description"/>
+                                            <p class="card-text">
+                                                <strong>Price: $<span t-esc="bike.price"/> per day</strong>
+                                            </p>
+                                            
+                                            <!-- Rental Request Form -->
+                                            <form action="/bikes/request" method="post" class="mt-auto">
+                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                <input type="hidden" name="bike_id" t-att-value="bike.id"/>
+                                                <div class="mb-3">
+                                                    <input type="text" class="form-control" name="name" placeholder="Your Name" required="required"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="date" class="form-control" name="start_date" required="required"/>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <input type="number" class="form-control" name="duration" placeholder="Duration (days)" min="1" required="required"/>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary w-100">Request Rental</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- My Requests Template -->
+        <template id="my_requests_template" name="My Requests Template">
+            <t t-call="website.layout">
+                <div id="wrap">
+                    <div class="container mt-4">
+                        <h1 class="text-center mb-4">My Bike Rental Requests</h1>
+                        
+                        <t t-if="not requests">
+                            <div class="alert alert-info text-center">
+                                <h4>No rental requests found</h4>
+                                <p>You haven't made any bike rental requests yet.</p>
+                                <a href="/bikes" class="btn btn-primary">Browse Bikes</a>
+                            </div>
+                        </t>
+                        
+                        <t t-else="">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Bike</th>
+                                            <th>Start Date</th>
+                                            <th>Duration</th>
+                                            <th>Status</th>
+                                            <th>Request Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="requests" t-as="req">
+                                            <tr>
+                                                <td t-esc="req.bike_id.name"/>
+                                                <td t-esc="req.start_date"/>
+                                                <td><span t-esc="req.duration"/> days</td>
+                                                <td>
+                                                    <span t-att-class="'badge ' + ('bg-success' if req.state == 'approved' else 'bg-warning' if req.state == 'pending' else 'bg-danger')"
+                                                          t-esc="req.state.title()"/>
+                                                </td>
+                                                <td t-esc="req.request_date"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Modal for Rental Request -->
+        <template id="rental_modal" name="Rental Request Modal">
+            <div class="modal fade" id="rentalModal" tabindex="-1" role="dialog" aria-labelledby="rentalModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rentalModalLabel">Request Rental</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/bikes/request" method="post" id="rentalForm">
+                                <input type="hidden" name="bike_id" id="modalBikeId"/>
+                                <div class="form-group">
+                                    <label for="modalName">Your Name</label>
+                                    <input type="text" class="form-control" id="modalName" name="name" placeholder="Your Name" required="required"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modalStartDate">Start Date</label>
+                                    <input type="date" class="form-control" id="modalStartDate" name="start_date" required="required"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modalDuration">Duration (days)</label>
+                                    <input type="number" class="form-control" id="modalDuration" name="duration" min="1" required="required"/>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

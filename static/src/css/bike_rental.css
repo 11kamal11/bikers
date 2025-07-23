@@ -1,0 +1,22 @@
+.bike-card {
+    transition: transform 0.2s;
+}
+
+.bike-card:hover {
+    transform: translateY(-5px);
+}
+
+.bike-card img {
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.bike-price {
+    font-size: 1.2em;
+    color: #007bff;
+    font-weight: bold;
+}
